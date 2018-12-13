@@ -6,6 +6,8 @@ var cursors;
 var diamonds;
 var score = 0;
 var scoreText;
+var bats;
+var gameOver = false;
 
 var config = {
     type: Phaser.AUTO,
@@ -30,10 +32,11 @@ var game = new Phaser.Game(config);
 
 function preload() {
     this.load.image('tlo', 'assets/tlo.jpg');
-    this.load.image('ground', 'assets/platform.png')
+    this.load.image('ground', 'assets/platform.png');
     this.load.image('jupiter', 'assets/Jupiter.png');
-    this.load.image('diamond', 'assets/diament.png')
+    this.load.image('diamond', 'assets/diament.png');
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
+    this.load.spritesheet('bat','assets/bat_sprite.png',{frameWidth:64, frameHeight:64});
 }
 
 function create() {
@@ -69,6 +72,13 @@ function create() {
         repeat: -1
     })
 
+    this.anims.create({
+        key: 'move',
+        frames: this.anims.generateFrameNumbers('bat', {start: 0, end: 15}),
+        frameRate: 20,
+        repeat: -1
+    });
+
     cursors = this.input.keyboard.createCursorKeys();
 
     diamonds = this.physics.add.group({
@@ -82,8 +92,13 @@ function create() {
         child.setScale(0.1);
     });
 
-    scoreText = this.add.text(16,16,'Score: 0', {fontSize: '32px', fill:'white'});
+    bats = this.physics.add.group();
 
+
+
+    scoreText = this.add.text(16,16,'Score: 0', {fontSize: '32px', fill:'white'});
+    this.physics.add.collider(bats,platforms);
+    this.physics.add.collider(bats,player,hitBat,null,this);
     this.physics.add.collider(player, platforms);
     this.physics.add.collider(diamonds, platforms);
 
@@ -122,4 +137,24 @@ function collectDiamond(player, diamond) {
 
     score += 10;
     scoreText.setText('Score: ' + score);
+
+    if(diamonds.countActive(true) === 0){
+        diamonds.children.iterate(function(child){
+            child.enableBody(true,child.x,0,true,true);
+        });
+        var x = (player.x < 400) ? Phaser.Math.Between(400,800) : Phaser.Math.Between(0,400);
+        var bat = bats.create(x,16,'bat');
+        bat.setBounce(1);
+        bat.setCollideWorldBounds(true);
+        bat.setVelocity(Phaser.Math.Between(-200, 200), 20);
+        bat.anims.play('move',true);
+        
+    }
+}
+
+function hitBat(player,bat){
+    this.physics.pause();
+    player.setTint(0xff0000);
+    player.anims.play('turn');
+    gameOver = true;
 }
