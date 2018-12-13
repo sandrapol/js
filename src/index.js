@@ -3,6 +3,7 @@ import 'phaser';
 var platforms;
 var player;
 var cursors;
+var jumpButton;
 
 var config = {
     type: Phaser.AUTO,
@@ -44,7 +45,7 @@ function create ()
     platforms.create(750,220,'ground');
 
     player = this.physics.add.sprite(100,450,'dude');
-    player.setBounce(0.5);
+    player.setBounce(0);
     player.setCollideWorldBounds(true);
 
     this.anims.create({
@@ -70,6 +71,7 @@ function create ()
     this.physics.add.collider(player,platforms);
 
     cursors = this.input.keyboard.createCursorKeys();
+    //jumpButton = this.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
   //  this.add.image(400,300,'jupiter');
     
 }
@@ -94,7 +96,7 @@ function update(){
             player.anims.play('turn');
         }
 
-        if (cursors.up.isDown && player.body.touching.down)
+        if (cursors.space.isDown && player.body.touching.down)
         {
             player.setVelocityY(-330);
         }
