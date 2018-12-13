@@ -4,6 +4,8 @@ var platforms;
 var player;
 var cursors;
 var diamonds;
+var score = 0;
+var scoreText;
 
 var config = {
     type: Phaser.AUTO,
@@ -72,13 +74,15 @@ function create() {
     diamonds = this.physics.add.group({
         key: 'diamond',
         repeat: 6,
-        setXY: { x: 12, y: 0, stepX: 70 }
+        setXY: { x: 12, y: 0, stepX: 120 }
     });
 
     diamonds.children.iterate(function (child) {
         child.setBounceY(Phaser.Math.FloatBetween(0.1, 0.3));
         child.setScale(0.1);
     });
+
+    scoreText = this.add.text(16,16,'Score: 0', {fontSize: '32px', fill:'white'});
 
     this.physics.add.collider(player, platforms);
     this.physics.add.collider(diamonds, platforms);
@@ -115,4 +119,7 @@ function update() {
 
 function collectDiamond(player, diamond) {
     diamond.disableBody(true, true);
+
+    score += 10;
+    scoreText.setText('Score: ' + score);
 }
