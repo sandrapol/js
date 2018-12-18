@@ -7,6 +7,7 @@ var diamonds;
 var score = 0;
 var scoreText;
 var bats;
+var doors;
 var gameOver = false;
 
 var config = {
@@ -35,7 +36,7 @@ function preload() {
     this.load.image('ground', 'assets/platform.png');
     this.load.image('jupiter', 'assets/Jupiter.png');
     this.load.image('diamond', 'assets/diament.png');
-    this.load.image('portal','assets/doors.png');
+    this.load.image('door','assets/doors.png');
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
     this.load.spritesheet('bat', 'assets/bat_sprite.png', { frameWidth: 64, frameHeight: 64 });
 }
@@ -48,9 +49,8 @@ function create() {
     platforms.create(600, 400, 'ground');
     platforms.create(50, 250, 'ground');
     platforms.create(750, 220, 'ground');
-    //doors = this.physics.add.group();
-    //var door = doors.create(200,400,'portal');
-    //door.setScale(0.2);
+    doors = this.physics.add.group();
+    
      
     console.log(platforms);
 
@@ -99,7 +99,7 @@ function create() {
         child.setScale(0.1);
     });
     bats = this.physics.add.group();
-    var bat = bats.create(16, 150, 'bat');
+    /* var bat = bats.create(16, 150, 'bat');
     var bat2 = bats.create(500, 130, 'bat');
     bat.setCollideWorldBounds(true);
     bat.setBounceY(0);
@@ -113,7 +113,7 @@ function create() {
     bat2.setGravityY(0.3);
     bat2.setBounceX(0.9); 
     bat2.setVelocityX(190);
-    bat2.anims.play('move', true);
+    bat2.anims.play('move', true); */
    
 
 
@@ -160,6 +160,7 @@ function create() {
     this.physics.add.collider(player, platforms);
     this.physics.add.collider(bats,platforms,getback,null,this);
     this.physics.add.collider(diamonds, platforms);
+    this.physics.add.collider(doors,platforms);
     this.physics.add.overlap(player, diamonds, collectDiamond, null, this);
     
 
@@ -193,21 +194,16 @@ function update() {
 function collectDiamond(player, diamond) {
     diamond.disableBody(true, true);
     score += 10;
-    scoreText.setText('Score: ' + score);
-
-    //  if (diamonds.countActive(true) === 0) {
-    //    diamonds.children.iterate(function (child) {
-    //      child.enableBody(true, child.x, 0, true, true);
-    //});
-    //var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
-    //    var bat = bats.create(x, 16, 'bat');
+    scoreText.setText('Score: ' + score); 
+    if (diamonds.countActive(true) === 0) {
+    var door = doors.create(760, 360, 'door').setScale(0.05);
     //  bat.setBounce(1);
     //bat.setCollideWorldBounds(true);
     //bat.setVelocity(Phaser.Math.Between(-200, 200), 20);
     //bat.anims.play('move', true);
-    //bat.allowGravity = false;
-
-    //}
+    door.allowGravity = false;
+    
+    }
 
 
 }
