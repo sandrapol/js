@@ -37,7 +37,7 @@ function preload() {
     this.load.image('diamond', 'assets/diament.png');
     this.load.image('door','assets/doors.png');
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
-    this.load.spritesheet('bat', 'assets/bat_sprite.png', { frameWidth: 64, frameHeight: 64, margintop:30  });
+    this.load.spritesheet('bat', 'assets/bat_sprite.png', { frameWidth: 64, frameHeight: 64,});
 }
 
 function create() {
@@ -49,7 +49,7 @@ function create() {
     platforms.create(50, 250, 'ground');
     platforms.create(750, 220, 'ground');
     
-    this.add.image(760,360,'door').setScale(0.05);
+    
     
      
     console.log(platforms);
@@ -98,8 +98,10 @@ function create() {
         child.setBounceY(Phaser.Math.FloatBetween(0.1, 0.3));
         child.setScale(0.1);
     });
+
+   
     bats = this.physics.add.group();
-    var bat = bats.create(16, 150, 'bat');
+    /* var bat = bats.create(16, 150, 'bat');
     var bat2 = bats.create(500, 130, 'bat');
     bat.setCollideWorldBounds(true);
     bat.setBounceY(0);
@@ -114,7 +116,7 @@ function create() {
     bat2.setBounceX(0.9); 
     bat2.setVelocityX(190);
     bat2.anims.play('move', true);
-   
+    */
 
 
 
@@ -162,6 +164,7 @@ function create() {
     this.physics.add.collider(diamonds, platforms);
     this.physics.add.overlap(player, diamonds, collectDiamond, null, this);
     
+    
 
     //  this.add.image(400,300,'jupiter');
 
@@ -188,6 +191,19 @@ function update() {
         player.setVelocityY(-330);
     }
     
+}
+
+function openTheDoor(player,door){
+    if (diamonds.countActive(true) === 0){
+        doors = this.physics.add.group({
+            key: 'door',
+            repeat: 1,
+            setXY: {x: 760, y: 360}
+        });
+        doors.children.iterate(function(child){
+            child.setScale(0.05);
+        })
+    }
 }
 
 function collectDiamond(player, diamond) {
