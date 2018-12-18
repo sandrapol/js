@@ -7,6 +7,7 @@ var diamonds;
 var score = 0;
 var scoreText;
 var bats;
+var doors;
 var gameOver = false;
 
 var config = {
@@ -50,8 +51,7 @@ function create() {
     platforms.create(600, 400, 'ground');
     platforms.create(50, 250, 'ground');
     platforms.create(750, 220, 'ground');
-    
-    
+    doors = this.physics.add.group();
     
      
     console.log(platforms);
@@ -116,8 +116,8 @@ function create() {
     bat2.setGravityY(0.3);
     bat2.setBounceX(0.9); 
     bat2.setVelocityX(190);
-    bat2.anims.play('move', true);
-    */
+    bat2.anims.play('move', true); */
+   
 
 
     scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: 'white' });
@@ -125,7 +125,7 @@ function create() {
     this.physics.add.collider(bats, player, hitBat, null, this);
     this.physics.add.collider(player, platforms);
     this.physics.add.collider(diamonds, platforms);
-
+    this.physics.add.collider(doors,platforms);
     this.physics.add.overlap(player, diamonds, collectDiamond, null, this);
     
     
@@ -176,21 +176,18 @@ function collectDiamond(player, diamond) {
     diamond.disableBody(true, true);
 
     score += 10;
-    scoreText.setText('Score: ' + score);
-
+    scoreText.setText('Score: ' + score); 
     if (diamonds.countActive(true) === 0) {
-        diamonds.children.iterate(function (child) {
-            child.enableBody(true, child.x, 0, true, true);
-        });
-        var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
-        var bat = bats.create(x, 16, 'bat');
-        bat.setBounce(1);
-        bat.setCollideWorldBounds(true);
-        bat.setVelocity(Phaser.Math.Between(-200, 200), 20);
-        bat.anims.play('move', true);
-        bat.allowGravity = false;
-
+    var door = doors.create(760, 360, 'door').setScale(0.05);
+    //  bat.setBounce(1);
+    //bat.setCollideWorldBounds(true);
+    //bat.setVelocity(Phaser.Math.Between(-200, 200), 20);
+    //bat.anims.play('move', true);
+    door.allowGravity = false;
+    
     }
+
+
 }
 
 
