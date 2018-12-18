@@ -18,7 +18,7 @@ var config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 350 },
-            debug: false
+            debug: true
         }
     },
     scene: {
@@ -35,8 +35,9 @@ function preload() {
     this.load.image('ground', 'assets/platform.png');
     this.load.image('jupiter', 'assets/Jupiter.png');
     this.load.image('diamond', 'assets/diament.png');
+    this.load.image('door','assets/doors.png');
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
-    this.load.spritesheet('bat', 'assets/bat_sprite.png', { frameWidth: 64, frameHeight: 64 });
+    this.load.spritesheet('bat', 'assets/bat_sprite.png', { frameWidth: 64, frameHeight: 64, margintop:30  });
 }
 
 function create() {
@@ -49,6 +50,11 @@ function create() {
     platforms.create(600, 400, 'ground');
     platforms.create(50, 250, 'ground');
     platforms.create(750, 220, 'ground');
+    
+    this.add.image(760,360,'door').setScale(0.05);
+    
+     
+    console.log(platforms);
 
     player = this.physics.add.sprite(100, 450, 'dude');
     player.setBounce(0.2);
