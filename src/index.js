@@ -42,9 +42,9 @@ function preload() {
 }
 
 function create() {
-    this.cameras.main.setBounds(0, 0, 3200, 600).setName('main');
+    
     var img= this.add.image(400, 300, 'tlo');
-    img.setScrollFactor(0);
+    
     platforms = this.physics.add.staticGroup();
 
     platforms.create(400, 568, 'ground').setScale(2).refreshBody();
@@ -155,7 +155,7 @@ function update() {
     if (cursors.up.isDown && player.body.touching.down) {
         player.setVelocityY(-330);
     }
-    this.cameras.main.scrollX = this.player.x - 400;
+    
 
 }
 
