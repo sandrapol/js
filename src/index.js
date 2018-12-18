@@ -114,7 +114,7 @@ function create() {
     bat2.setBounceY(0);
     bat2.setGravityY(0.3);
     bat2.setBounceX(0.9); 
-    bat2.setVelocityX(140);
+    bat2.setVelocityX(120);
     bat2.anims.play('move', true);
    
 
