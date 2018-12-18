@@ -11,6 +11,18 @@ var bats;
 var doors;
 var gameOver = false;
 
+var config_music =
+{
+    mute: false,
+    volume: 1,
+    rate: 1,
+    detune: 0,
+    seek: 0,
+    loop: true,
+    delay: 0
+}
+
+
 var config = {
     type: Phaser.AUTO,
     parent: 'phaser-example',
@@ -20,7 +32,7 @@ var config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 350 },
-            debug: false
+            debug: true
         }
     },
     scene: {
@@ -33,26 +45,64 @@ var config = {
 var game = new Phaser.Game(config);
 
 function preload() {
+    var progressBar = this.add.graphics();
+    var progressBox = this.add.graphics();
+    progressBox.fillStyle(0x222222, 0.8);
+    progressBox.fillRect(240, 270, 320, 50);
+
     this.load.image('tlo', 'assets/tlo.jpg');
     this.load.image('ground', 'assets/platform.png');
     this.load.image('jupiter', 'assets/Jupiter.png');
     this.load.image('diamond', 'assets/diament.png');
-    this.load.image('door','assets/doors.png');
+    this.load.image('door', 'assets/doors.png');
     this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
     this.load.spritesheet('bat', 'assets/bat_sprite.png', { frameWidth: 64, frameHeight: 64 });
+    this.load.spritesheet('skeleton', 'assets/skeleton.png', { frameWidth: 48, frameHeight: 48 });
+    this.load.audio('Spooky', 'assets/Spooky.mp3');
+
+    this.load.on('progress', function (value) {
+        console.log(value);
+        progressBar.clear();
+        progressBar.fillStyle(0xffffff, 1);
+        progressBar.fillRect(250, 280, 300 * value, 30);
+    });
+
+    this.load.on('fileprogress', function (file) {
+        console.log(file.src);
+    });
+
+    this.load.on('complete', function () {
+        console.log('complete');
+        loadingText.destroy();
+        progressBar.destroy();
+        progressBox.destroy();
+    });
+    var width = this.cameras.main.width;
+    var height = this.cameras.main.height;
+    var loadingText = this.make.text({
+        x: width / 2,
+        y: height / 2 - 50,
+        text: 'Loading...',
+        style: {
+            font: '20px monospace',
+            fill: '#ffffff'
+        }
+    });
+    loadingText.setOrigin(0.5, 0.5);
 }
 
 function create() {
     this.add.image(400, 300, 'tlo');
     platforms = this.physics.add.staticGroup();
-
+    this.sound.add('Spooky', config_music);
+    this.sound.play('Spooky', config_music);
     platforms.create(400, 568, 'ground').setScale(2).refreshBody();
     platforms.create(600, 400, 'ground');
     platforms.create(50, 250, 'ground');
     platforms.create(750, 220, 'ground');
-   
-    
-     
+
+
+
     console.log(platforms);
 
     player = this.physics.add.sprite(100, 450, 'dude');
@@ -87,8 +137,22 @@ function create() {
         repeat: -1
     });
 
+    this.anims.create({
+        key: 'move_left',
+        frames: this.anims.generateFrameNumbers('skeleton', { start: 12, end: 14 }),
+        frameRate: 20,
+        repeat: -1
+    });
+
+    this.anims.create({
+        key: 'move_right',
+        frames: this.anims.generateFrameNumbers('skeleton', { start: 24, end: 26 }),
+        frameRate: 20,
+        repeat: -1
+    });
+
     cursors = this.input.keyboard.createCursorKeys();
-    
+
 
     diamonds = this.physics.add.group({
         key: 'diamond',
@@ -106,17 +170,17 @@ function create() {
     bat.setCollideWorldBounds(true);
     bat.setBounceY(0);
     bat.setGravityY(0.3);
-    bat.setBounceX(0.9); 
+    bat.setBounceX(0.9);
     bat.setVelocityX(150);
     bat.anims.play('move', true);
 
     bat2.setCollideWorldBounds(true);
     bat2.setBounceY(0);
     bat2.setGravityY(0.3);
-    bat2.setBounceX(0.9); 
+    bat2.setBounceX(0.9);
     bat2.setVelocityX(140);
     bat2.anims.play('move', true);
-   
+
 
 
 
@@ -155,17 +219,17 @@ function create() {
          });
       
      }; */
-    
-     
-   
+
+
+
     this.physics.add.collider(bats, player, hitBat, null, this);
     this.physics.add.collider(player, platforms);
-    this.physics.add.collider(bats,platforms,getback,null,this);
+    this.physics.add.collider(bats, platforms, getback, null, this);
     this.physics.add.collider(diamonds, platforms);
-    this.physics.add.collider(doors,platforms);
+    this.physics.add.collider(doors, platforms);
     this.physics.add.overlap(player, diamonds, collectDiamond, null, this);
-    this.physics.add.overlap(player,doors,nextLevel,null,this);
-    
+    this.physics.add.overlap(player, doors, nextLevel, null, this);
+
 
     //  this.add.image(400,300,'jupiter');
 
@@ -191,30 +255,30 @@ function update() {
     if (cursors.up.isDown && player.body.touching.down) {
         player.setVelocityY(-330);
     }
-    
+
 }
 
 function collectDiamond(player, diamond) {
     diamond.disableBody(true, true);
     score += 10;
-    scoreText.setText('Score: ' + score); 
+    scoreText.setText('Score: ' + score);
     if (diamonds.countActive(true) === 0) {
-    var door = doors.create(760, 360, 'door').setScale(0.05);
-    door.setDepth(1);
-    //  bat.setBounce(1);
-    //bat.setCollideWorldBounds(true);
-    //bat.setVelocity(Phaser.Math.Between(-200, 200), 20);
-    //bat.anims.play('move', true);
-    door.allowGravity = false;
-    
+        var door = doors.create(760, 360, 'door').setScale(0.05);
+        door.setDepth(1);
+        //  bat.setBounce(1);
+        //bat.setCollideWorldBounds(true);
+        //bat.setVelocity(Phaser.Math.Between(-200, 200), 20);
+        //bat.anims.play('move', true);
+        door.allowGravity = false;
+
     }
 }
 
-function nextLevel(door){
+function nextLevel(door) {
     game.scene.add('Level', Level2, true, { x: 0, y: 0 });
-    door.disableBody(true,true);
- //   this.scene.remove(this.scene);
-    this.scene.start('Level',score);
+    door.disableBody(true, true);
+    // this.scene.remove();
+    this.scene.start('Level', score);
 }
 
 
@@ -226,13 +290,31 @@ function getback(bat, platforms) {
     // check if its position greater than the width of the platform minus its width
     // if slime is moving to the left, 
     // check if its position exceeds the left-most point of the platform
-    
+
     if (bat.body.velocity.x > 0 && (bat.x + 200) > (platforms.x + platforms.width) ||
-            (bat.body.velocity.x< 0 && bat.x < platforms.x -200)) {
+        (bat.body.velocity.x < 0 && bat.x < platforms.x - 200)) {
         bat.setVelocityX(bat.body.velocity.x * -1.1);
-        
-    } 
+    }
 }
+
+function getback_skeleton(bat, platforms) {
+
+    // if slime is moving to the right, 
+    // check if its position greater than the width of the platform minus its width
+    // if slime is moving to the left, 
+    // check if its position exceeds the left-most point of the platform
+
+    if (bat.body.velocity.x > 0 && (bat.x + 200) > (platforms.x + platforms.width) ||
+        (bat.body.velocity.x < 0 && bat.x < platforms.x - 200)) {
+        bat.setVelocityX(bat.body.velocity.x * -1.1);
+    }
+    if (bat.body.velocity.x > 0) {
+        bat.anims.play('move_right', true);
+    } else {
+        bat.anims.play('move_left', true);
+    }
+}
+
 
 function hitBat(player, bat) {
     this.physics.pause();
@@ -519,143 +601,148 @@ class Level2 extends Phaser.Scene {
     }
 
     preload() {
-    this.load.image('tlo', 'assets/tlo.jpg');
-    this.load.image('ground', 'assets/platform.png');
-    this.load.image('jupiter', 'assets/Jupiter.png');
-    this.load.image('diamond', 'assets/diament.png');
-    this.load.image('door','assets/doors.png');
-    this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
-    this.load.spritesheet('bat', 'assets/bat_sprite.png', { frameWidth: 64, frameHeight: 64 });
+        this.load.image('tlo', 'assets/tlo.jpg');
+        this.load.image('ground', 'assets/platform.png');
+        this.load.image('jupiter', 'assets/Jupiter.png');
+        this.load.image('diamond', 'assets/diament.png');
+        this.load.image('door', 'assets/doors.png');
+        this.load.spritesheet('dude', 'assets/dude.png', { frameWidth: 32, frameHeight: 48 });
+        this.load.spritesheet('bat', 'assets/bat_sprite.png', { frameWidth: 64, frameHeight: 64 });
+        this.load.spritesheet('skeleton', 'assets/skeleton.png', { frameWidth: 48, frameHeight: 48 });
+        this.load.audio('Spooky', 'assets/Spooky.mp3');
 
-    } 
+
+    }
 
     create() {
         this.add.image(400, 300, 'tlo');
-    platforms = this.physics.add.staticGroup();
+        platforms = this.physics.add.staticGroup();
+        this.sound.add('Spooky', config_music);
+        platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+        platforms.create(600, 400, 'ground');
+        platforms.create(50, 250, 'ground');
+        platforms.create(750, 220, 'ground');
 
-    platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-    platforms.create(600, 400, 'ground');
-    platforms.create(50, 250, 'ground');
-    platforms.create(750, 220, 'ground');
-   
-    
-     
-    console.log(platforms);
 
-    player = this.physics.add.sprite(100, 450, 'dude');
-    player.setBounce(0.2);
-    player.setCollideWorldBounds(true);
-    player.setDepth(2);
-    doors = this.physics.add.group();
-    
 
-    
+        console.log(platforms);
 
-    cursors2 = this.input.keyboard.createCursorKeys(); 
-    
-
-    diamonds = this.physics.add.group({
-        key: 'diamond',
-        repeat: 6,
-        setXY: { x: 12, y: 0, stepX: 120 }
-    });
-
-    diamonds.children.iterate(function (child) {
-        child.setBounceY(Phaser.Math.FloatBetween(0.1, 0.3));
-        child.setScale(0.1);
-    });
-    bats = this.physics.add.group();
-    /* var bat = bats.create(16, 150, 'bat');
-    var bat2 = bats.create(500, 130, 'bat');
-    bat.setCollideWorldBounds(true);
-    bat.setBounceY(0);
-    bat.setGravityY(0.3);
-    bat.setBounceX(0.9); 
-    bat.setVelocityX(150);
-    bat.anims.play('move', true);
-
-    bat2.setCollideWorldBounds(true);
-    bat2.setBounceY(0);
-    bat2.setGravityY(0.3);
-    bat2.setBounceX(0.9); 
-    bat2.setVelocityX(190);
-    bat2.anims.play('move', true); */
-   
+        player = this.physics.add.sprite(100, 450, 'dude');
+        player.setBounce(0.2);
+        player.setCollideWorldBounds(true);
+        player.setDepth(2);
+        doors = this.physics.add.group();
 
 
 
 
-    /*  var bat = bats.create(16, 16, 'bat');
-         bat.setBounce(0.8);
-         bat.setCollideWorldBounds(true);
-         if (bat.x = 10)
-         bat.setVelocity(Phaser.Math.Between(0, 200), 20);
-         else
-         bat.setVelocity(Phaser.Math.Between(-200, 0), 20);
-         bat.anims.play('move', true);
-         bat.allowGravity = false; */
+        cursors2 = this.input.keyboard.createCursorKeys();
 
-    scoreText = this.add.text(16, 16,'Score: '+ score, { fontSize: '32px', fill: 'white' });
-    /* bats.prototype.update = function () {
-  
-         game.physics.arcade.collide(this, platforms, function (bats, platform) {
-             // if slime is moving to the right, 
-             // check if its position greater than the width of the platform minus its width
-             // if slime is moving to the left, 
-             // check if its position exceeds the left-most point of the platform
-             if (bats.body.velocity.x > 0 && bats.x > platform.x + (platform.width - bats.width) ||
-                     bats.body.velocity.x < 0 && bats.x < platform.x) {
-                 bats.body.velocity.x *= -1; 
-             } 
-             if (bats.body.velocity.x > 0) {
-                 bats.animations.play('move');
-             } else {
-                 bats.animations.play('move');
-             }
-         });
+
+        diamonds = this.physics.add.group({
+            key: 'diamond',
+            repeat: 6,
+            setXY: { x: 12, y: 0, stepX: 120 }
+        });
+
+        diamonds.children.iterate(function (child) {
+            child.setBounceY(Phaser.Math.FloatBetween(0.1, 0.3));
+            child.setScale(0.1);
+        });
+        bats = this.physics.add.group();
+        var bat = bats.create(16, 150, 'skeleton');
+        var bat2 = bats.create(500, 130, 'skeleton');
+        bat.setCollideWorldBounds(true);
+        bat.setBounceY(0);
+        bat.setGravityY(0.3);
+        bat.setBounceX(0.9);
+        bat.setVelocityX(150);
+        // bat.anims.play('move_left', true);
+
+        bat2.setCollideWorldBounds(true);
+        bat2.setBounceY(0);
+        bat2.setGravityY(0.3);
+        bat2.setBounceX(0.9);
+        bat2.setVelocityX(190);
+        //  bat2.anims.play('move_right', true); 
+
+
+
+
+
+        /*  var bat = bats.create(16, 16, 'bat');
+             bat.setBounce(0.8);
+             bat.setCollideWorldBounds(true);
+             if (bat.x = 10)
+             bat.setVelocity(Phaser.Math.Between(0, 200), 20);
+             else
+             bat.setVelocity(Phaser.Math.Between(-200, 0), 20);
+             bat.anims.play('move', true);
+             bat.allowGravity = false; */
+
+        scoreText = this.add.text(16, 16, 'Score: ' + score, { fontSize: '32px', fill: 'white' });
+        /* bats.prototype.update = function () {
       
-         game.physics.arcade.collide(this, bats, function (bat, bats) {
-             bat.body.velocity.x *= -1.0001;
-         });
-      
-     }; */
-    
-     
-   
-    this.physics.add.collider(bats, player, hitBat, null, this);
-    this.physics.add.collider(player, platforms);
-    this.physics.add.collider(bats,platforms,getback,null,this);
-    this.physics.add.collider(diamonds, platforms);
-    this.physics.add.collider(doors,platforms);
-    this.physics.add.overlap(player, diamonds, collectDiamond, null, this);
-    
-    
-    //  this.add.image(400,300,'jupiter');
+             game.physics.arcade.collide(this, platforms, function (bats, platform) {
+                 // if slime is moving to the right, 
+                 // check if its position greater than the width of the platform minus its width
+                 // if slime is moving to the left, 
+                 // check if its position exceeds the left-most point of the platform
+                 if (bats.body.velocity.x > 0 && bats.x > platform.x + (platform.width - bats.width) ||
+                         bats.body.velocity.x < 0 && bats.x < platform.x) {
+                     bats.body.velocity.x *= -1; 
+                 } 
+                 if (bats.body.velocity.x > 0) {
+                     bats.animations.play('move');
+                 } else {
+                     bats.animations.play('move');
+                 }
+             });
+          
+             game.physics.arcade.collide(this, bats, function (bat, bats) {
+                 bat.body.velocity.x *= -1.0001;
+             });
+          
+         }; */
+
+
+
+        this.physics.add.collider(bats, player, hitBat, null, this);
+        this.physics.add.collider(player, platforms);
+        this.physics.add.collider(bats, platforms, getback_skeleton, null, this);
+        this.physics.add.collider(diamonds, platforms);
+        this.physics.add.collider(doors, platforms);
+        this.physics.add.overlap(player, diamonds, collectDiamond, null, this);
+
+
+        //  this.add.image(400,300,'jupiter');
     }
 
-     update(){
+    update() {
         if (cursors2.left.isDown) {
             player.setVelocityX(-160);
-    
+
             player.anims.play('left', true);
         }
         else if (cursors2.right.isDown) {
             player.setVelocityX(160);
-    
+
             player.anims.play('right', true);
         }
         else {
             player.setVelocityX(0);
-    
+
             player.anims.play('turn');
         }
-    
+
         if (cursors2.up.isDown && player.body.touching.down) {
             player.setVelocityY(-330);
         }
     }
 
-    
+
+
+
 
 }
 
