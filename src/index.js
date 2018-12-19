@@ -513,9 +513,9 @@ class Highscore extends Phaser.Scene {
     {
         this.add.bitmapText(100, 260, 'arcade', 'RANK  SCORE   NAME').setTint(0xff00ff);
         if(score<50){
-        this.add.bitmapText(100, 310, 'arcade', '1ST   50000').setTint(0xff0000);
+        this.add.bitmapText(100, 310, 'arcade', '1ST      50').setTint(0xff0000);
         }else{
-        this.add.bitmapText(100, 310, 'arcade', '1ST  '+score+'000').setTint(0xff0000);
+        this.add.bitmapText(100, 310, 'arcade', '1ST     '+score).setTint(0xff0000);
         }
 
         this.playerText = this.add.bitmapText(580, 310, 'arcade', '').setTint(0xff0000);
@@ -536,10 +536,10 @@ class Highscore extends Phaser.Scene {
     {
         this.scene.stop('InputPanel');
 
-        this.add.bitmapText(100, 360, 'arcade', '2ND   40000    ANT').setTint(0xff8200);
-        this.add.bitmapText(100, 410, 'arcade', '3RD   30000    .-.').setTint(0xffff00);
-        this.add.bitmapText(100, 460, 'arcade', '4TH   20000    BOB').setTint(0x00ff00);
-        this.add.bitmapText(100, 510, 'arcade', '5TH   10000    ZIK').setTint(0x00bfff);
+        this.add.bitmapText(100, 360, 'arcade', '2ND   40       ANT').setTint(0xff8200);
+        this.add.bitmapText(100, 410, 'arcade', '3RD   30       .-.').setTint(0xffff00);
+        this.add.bitmapText(100, 460, 'arcade', '4TH   20       BOB').setTint(0x00ff00);
+        this.add.bitmapText(100, 510, 'arcade', '5TH   10       ZIK').setTint(0x00bfff);
     }
 
     updateName (name)
