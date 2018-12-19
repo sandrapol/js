@@ -536,10 +536,10 @@ class Highscore extends Phaser.Scene {
     {
         this.scene.stop('InputPanel');
 
-        this.add.bitmapText(100, 360, 'arcade', '2ND   40       ANT').setTint(0xff8200);
-        this.add.bitmapText(100, 410, 'arcade', '3RD   30       .-.').setTint(0xffff00);
-        this.add.bitmapText(100, 460, 'arcade', '4TH   20       BOB').setTint(0x00ff00);
-        this.add.bitmapText(100, 510, 'arcade', '5TH   10       ZIK').setTint(0x00bfff);
+        this.add.bitmapText(100, 360, 'arcade', '2ND      40    ANT').setTint(0xff8200);
+        this.add.bitmapText(100, 410, 'arcade', '3RD      30    .-.').setTint(0xffff00);
+        this.add.bitmapText(100, 460, 'arcade', '4TH      20    BOB').setTint(0x00ff00);
+        this.add.bitmapText(100, 510, 'arcade', '5TH      10    ZIK').setTint(0x00bfff);
     }
 
     updateName (name)
