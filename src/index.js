@@ -187,42 +187,8 @@ function create() {
 
 
 
-
-
-    /*  var bat = bats.create(16, 16, 'bat');
-         bat.setBounce(0.8);
-         bat.setCollideWorldBounds(true);
-         if (bat.x = 10)
-         bat.setVelocity(Phaser.Math.Between(0, 200), 20);
-         else
-         bat.setVelocity(Phaser.Math.Between(-200, 0), 20);
-         bat.anims.play('move', true);
-         bat.allowGravity = false; */
-
     scoreText = this.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: 'white' });
-    /* bats.prototype.update = function () {
-  
-         game.physics.arcade.collide(this, platforms, function (bats, platform) {
-             // if slime is moving to the right, 
-             // check if its position greater than the width of the platform minus its width
-             // if slime is moving to the left, 
-             // check if its position exceeds the left-most point of the platform
-             if (bats.body.velocity.x > 0 && bats.x > platform.x + (platform.width - bats.width) ||
-                     bats.body.velocity.x < 0 && bats.x < platform.x) {
-                 bats.body.velocity.x *= -1; 
-             } 
-             if (bats.body.velocity.x > 0) {
-                 bats.animations.play('move');
-             } else {
-                 bats.animations.play('move');
-             }
-         });
-      
-         game.physics.arcade.collide(this, bats, function (bat, bats) {
-             bat.body.velocity.x *= -1.0001;
-         });
-      
-     }; */
+
 
 
 
@@ -235,7 +201,6 @@ function create() {
     this.physics.add.overlap(player, doors, nextLevel, null, this);
 
 
-    //  this.add.image(400,300,'jupiter');
 
 }
 
@@ -262,18 +227,7 @@ function update() {
 
 }
 
-function openTheDoor(player,door){
-    if (diamonds.countActive(true) === 0){
-        doors = this.physics.add.group({
-            key: 'door',
-            repeat: 1,
-            setXY: {x: 760, y: 360}
-        });
-        doors.children.iterate(function(child){
-            child.setScale(0.05);
-        })
-    }
-}
+
 
 function collectDiamond(player, diamond) {
     diamond.disableBody(true, true);
@@ -295,19 +249,13 @@ function collectDiamond(player, diamond) {
 function nextLevel(door) {
     game.scene.add('Level', Level2, true, { x: 0, y: 0 });
     door.disableBody(true, true);
-    // this.scene.remove();
     this.scene.start('Level', score);
 }
 
 
 
-
 function getback(bat, platforms) {
 
-    // if slime is moving to the right, 
-    // check if its position greater than the width of the platform minus its width
-    // if slime is moving to the left, 
-    // check if its position exceeds the left-most point of the platform
 
     if (bat.body.velocity.x > 0 && (bat.x + 200) > (platforms.x + platforms.width) ||
         (bat.body.velocity.x < 0 && bat.x < platforms.x - 200)) {
@@ -317,14 +265,23 @@ function getback(bat, platforms) {
 
 function getback_skeleton(bat, platforms) {
 
-    // if slime is moving to the right, 
-    // check if its position greater than the width of the platform minus its width
-    // if slime is moving to the left, 
-    // check if its position exceeds the left-most point of the platform
 
     if (bat.body.velocity.x > 0 && (bat.x + 200) > (platforms.x + platforms.width) ||
         (bat.body.velocity.x < 0 && bat.x < platforms.x - 200)) {
         bat.setVelocityX(bat.body.velocity.x * -1.1);
+    }
+    if (bat.body.velocity.x > 0) {
+        bat.anims.play('move_right', true);
+    } else {
+        bat.anims.play('move_left', true);
+    }
+}
+function getback_skeleton_middle(bat, platforms) {
+
+
+    if (bat.body.velocity.x > 0 && (bat.x + 200) > (platforms.x + platforms.width) ||
+        (bat.body.velocity.x < 0 && bat.x < platforms.x - 200)) {
+        bat.setVelocityX(bat.body.velocity.x * -1);
     }
     if (bat.body.velocity.x > 0) {
         bat.anims.play('move_right', true);
@@ -340,8 +297,16 @@ function hitBat(player, bat) {
     player.anims.play('turn');
     gameOver = true;
    game.scene.add('Highscore',Highscore,true,{x:0,y:0});
+   
    this.input.keyboard.enabled = false;
+}
 
+function endGame(player,door){
+    this.physics.pause();
+    player.anims.play('turn');
+    gameOver = true;
+   game.scene.add('Highscore',Highscore,true,{x:0,y:0});
+   this.input.keyboard.enabled = false;
 }
 
 class InputPanel extends Phaser.Scene {
@@ -525,78 +490,13 @@ class InputPanel extends Phaser.Scene {
     }
 }
 
-class Starfield extends Phaser.Scene {
 
-    constructor ()
-    {
-        super({ key: 'Starfield', active: true });
-
-        this.stars;
-
-        this.distance = 300;
-        this.speed = 250;
-
-        this.max = 500;
-        this.xx = [];
-        this.yy = [];
-        this.zz = [];
-    }
-
-    preload ()
-    {
-        this.load.image('star', 'assets/star4.png');
-    }
-
-    create ()
-    {
-        //  Do this, otherwise this Scene will steal all keyboard input
-        this.input.keyboard.enabled = false;
-
-        this.stars = this.add.blitter(0, 0, 'star');
-
-        for (let i = 0; i < this.max; i++)
-        {
-            this.xx[i] = Math.floor(Math.random() * 800) - 400;
-            this.yy[i] = Math.floor(Math.random() * 600) - 300;
-            this.zz[i] = Math.floor(Math.random() * 1700) - 100;
-
-            let perspective = this.distance / (this.distance - this.zz[i]);
-            let x = 400 + this.xx[i] * perspective;
-            let y = 300 + this.yy[i] * perspective;
-
-            this.stars.create(x, y);
-        }
-    }
-
-    update (time, delta)
-    {
-        for (let i = 0; i < this.max; i++)
-        {
-            let perspective = this.distance / (this.distance - this.zz[i]);
-            let x = 400 + this.xx[i] * perspective;
-            let y = 300 + this.yy[i] * perspective;
-
-            this.zz[i] += this.speed * (delta / 1000);
-
-            if (this.zz[i] > 300)
-            {
-                this.zz[i] -= 600;
-            }
-
-            let bob = this.stars.children.list[i];
-
-            bob.x = x;
-            bob.y = y;
-        }
-    }
-
-}
 
 class Highscore extends Phaser.Scene {
 
     constructor(score) {
         super({ key: 'Highscore', active: true });
-        this.score
+        this.score=score
         this.playerText;
     }
 
@@ -612,7 +512,11 @@ class Highscore extends Phaser.Scene {
     create ()
     {
         this.add.bitmapText(100, 260, 'arcade', 'RANK  SCORE   NAME').setTint(0xff00ff);
+        if(score<50){
         this.add.bitmapText(100, 310, 'arcade', '1ST   50000').setTint(0xff0000);
+        }else{
+        this.add.bitmapText(100, 310, 'arcade', '1ST  '+score+'000').setTint(0xff0000);
+        }
 
         this.playerText = this.add.bitmapText(580, 310, 'arcade', '').setTint(0xff0000);
 
@@ -671,11 +575,10 @@ class Level2 extends Phaser.Scene {
         this.add.image(400, 300, 'tlo');
         platforms = this.physics.add.staticGroup();
         this.sound.add('Spooky', config_music);
-        platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-        platforms.create(600, 400, 'ground');
-        platforms.create(50, 250, 'ground');
-        platforms.create(750, 220, 'ground');
-
+        platforms.create(400, 568, 'ground').setScale(2).refreshBody();//ziemia
+        platforms.create(700, 340, 'ground');//platforma nisko po prawej
+        platforms.create(120, 400, 'ground');//platforma po lewej
+        platforms.create(430, 190, 'ground');
 
 
         console.log(platforms);
@@ -685,8 +588,6 @@ class Level2 extends Phaser.Scene {
         player.setCollideWorldBounds(true);
         player.setDepth(2);
         doors = this.physics.add.group();
-
-
 
 
         cursors2 = this.input.keyboard.createCursorKeys();
@@ -710,65 +611,27 @@ class Level2 extends Phaser.Scene {
         bat.setGravityY(0.3);
         bat.setBounceX(0.9);
         bat.setVelocityX(150);
-        // bat.anims.play('move_left', true);
 
         bat2.setCollideWorldBounds(true);
         bat2.setBounceY(0);
         bat2.setGravityY(0.3);
         bat2.setBounceX(0.9);
         bat2.setVelocityX(190);
-        //  bat2.anims.play('move_right', true); 
 
-
-
-
-
-        /*  var bat = bats.create(16, 16, 'bat');
-             bat.setBounce(0.8);
-             bat.setCollideWorldBounds(true);
-             if (bat.x = 10)
-             bat.setVelocity(Phaser.Math.Between(0, 200), 20);
-             else
-             bat.setVelocity(Phaser.Math.Between(-200, 0), 20);
-             bat.anims.play('move', true);
-             bat.allowGravity = false; */
 
         scoreText = this.add.text(16, 16, 'Score: ' + score, { fontSize: '32px', fill: 'white' });
-        /* bats.prototype.update = function () {
-      
-             game.physics.arcade.collide(this, platforms, function (bats, platform) {
-                 // if slime is moving to the right, 
-                 // check if its position greater than the width of the platform minus its width
-                 // if slime is moving to the left, 
-                 // check if its position exceeds the left-most point of the platform
-                 if (bats.body.velocity.x > 0 && bats.x > platform.x + (platform.width - bats.width) ||
-                         bats.body.velocity.x < 0 && bats.x < platform.x) {
-                     bats.body.velocity.x *= -1; 
-                 } 
-                 if (bats.body.velocity.x > 0) {
-                     bats.animations.play('move');
-                 } else {
-                     bats.animations.play('move');
-                 }
-             });
-          
-             game.physics.arcade.collide(this, bats, function (bat, bats) {
-                 bat.body.velocity.x *= -1.0001;
-             });
-          
-         }; */
-
 
 
         this.physics.add.collider(bats, player, hitBat, null, this);
         this.physics.add.collider(player, platforms);
-        this.physics.add.collider(bats, platforms, getback_skeleton, null, this);
+        this.physics.add.collider(bat, platforms, getback_skeleton, null, this);
+        this.physics.add.collider(bat2, platforms, getback_skeleton_middle, null, this);
         this.physics.add.collider(diamonds, platforms);
         this.physics.add.collider(doors, platforms);
+        this.physics.add.overlap(player, doors, endGame, null, this);
         this.physics.add.overlap(player, diamonds, collectDiamond, null, this);
 
 
-        //  this.add.image(400,300,'jupiter');
     }
 
     update() {
@@ -792,10 +655,6 @@ class Level2 extends Phaser.Scene {
             player.setVelocityY(-330);
         }
     }
-
-
-
-
 
 }
 
